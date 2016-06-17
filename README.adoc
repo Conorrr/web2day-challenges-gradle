@@ -1,0 +1,7 @@
+= Gradle and the challenges of modern build tools
+
+Slides for talk given at Web2Day Nantes, June 2016.
+
+Pre-rendered slides can be viewed at http://melix.github.io/web2day-challenges-gradle
+
+

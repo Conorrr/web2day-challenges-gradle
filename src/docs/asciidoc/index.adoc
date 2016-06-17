@@ -1,0 +1,289 @@
+= Gradle and the Challenges of Modern Build Tools
+by Cédric Champeau (@CedricChampeau)
+2016-06-16
+:revnumber: {project-version}
+:example-caption!:
+ifndef::imagesdir[:imagesdir: images]
+:navigation:
+:menu:
+:goto:
+:status:
+:adoctor: http://asciidoctor.org/[Asciidoctor]
+:gradle: http://gradle.org[Gradle]
+
+[data-background="images/nantes.jpg"]
+== Who am I
+
+[source,groovy]
+----
+speaker {
+    name 'Cédric Champeau'
+    company 'Gradle Inc'
+    oss 'Apache Groovy committer',
+    successes (['Static type checker',
+                    'Static compilation',
+                    'Traits',
+                    'Markup template engine',
+                    'DSLs'])
+        failures Stream.of(bugs),
+        twitter '@CedricChampeau',
+        github 'melix',
+        extraDescription '''Groovy in Action 2 co-author
+Misc OSS contribs (Gradle plugins, deck2pdf, jlangdetect, ...)'''
+}
+----
+
+image::GradleLogoReg.png[]
+
+== Groovy in Action 2
+
+image:koenig2.png[]
+
+https://www.manning.com/books/groovy-in-action-second-edition
+
+== What is a build tool?
+
+* Make
+* Ant
+* Maven
+* Sbt
+* Grunt
+* Gradle
+* ...
+
+== Why a build tool?
+
+* Automation
+* Integration of heterogeneous tools
+** compiler
+** code quality
+** IDE
+** deployment
+* Continuous integration
+* Continuous deployment
+
+[data-background="images/evolution.jpg"]
+== Software has evolved
+
+=== Software is eating the world
+
+* No longer the IT crowd
+* From support to business
+
+=== Different architectures
+
+* PHP
+* Big monolitic apps
+* Mobile apps
+* Multiplatform
+* Micro-services
+* Cloud
+
+=== Different scale
+
+* Enterprise repositories
+** Ivy
+** Maven
+** Docker
+* Enterprise builds
+** Custom conventions
+** Corporate policies
+
+=== New requirements
+
+* TDD / BDD
+* Integration tests
+* Functional tests
+* Build pipelines
+
+In a word: automation
+
+== Why Gradle
+
+[data-background="images/End-Broken-Release-Processes-01.svg"]
+[%notitle]
+=== a
+
+[data-background="images/End-Bug-Regressions-01.svg"]
+[%notitle]
+=== a
+
+[data-background="images/End-Build-Script-Chaos.svg"]
+[%notitle]
+=== a
+
+[data-background="images/End-Code-Freeze-01.svg"]
+[%notitle]
+=== a
+
+[data-background="images/End-Deathmarched-01.svg"]
+[%notitle]
+=== a
+
+[data-background="images/End-Long-Build-Times-01.svg"]
+[%notitle]
+=== a
+
+[%notitle]
+[data-background="images/Pieter_Bruegel_the_Elder-The_Tower_of_Babel.jpg"]
+== Polyglot programming
+
+[data-background="images/Pieter_Bruegel_the_Elder-The_Tower_of_Babel.jpg"]
+== Polyglot programming
+
+== Polyglot programming
+
+* Java / Groovy / Scala / Clojure / Kotlin / ...
+* Javascript
+* Native (C/C++/...)
+* Swift
+* Python
+* Ruby
+
+== Multi-project builds
+
+=== SVN vs Git
+
+* Multiple branches
+* DVCS
+* Commit hash as version
+
+=== Mono-repo vs multi-repo
+
+* Usual tooling not adapted to multi-repo
+* Mono-repo cumbersome
+* Composite builds?
+
+== Dependency management
+
+* Dependency substitution
+* Variant-aware
+* API vs implementation
+* Compile avoidance
+
+== Dependency management
+
+* Dynamic versions caching / tuning
+* NPM anyone?
+* Build reproducibility
+
+[data-background="images/anatomy.svg"]
+== Deep modeling
+
+=== Conventions are not rules
+
+* Models first
+** I want to build a _Java library_
+** I want to build an _Android application_
+** I want to build a _micro-service_
+** I want to build a _Gradle plugin_
+
+=== Tools should not get in the way
+
+* Tools should _model_ those
+* Conventions should be model aware
+
+=== A Java library
+[source,groovy]
+----
+model {
+    components {
+        main(JvmLibrarySpec) {
+            targetPlatform 'java8'
+            targetPlatform 'java9'
+            api {
+               exports 'com.acme.mylib'
+            }
+        }
+    }
+    testSuites {
+        test(JUnitTestSuiteSpec) {
+            jUnitVersion '4.12'
+            testing $.components.main
+        }
+    }
+}
+----
+
+=== Benefits of deep modelling
+
+screencast:compile-avoidance[]
+
+[%notitle]
+[data-background="images/deploy.jpg"]
+== Deployment
+
+[data-background="images/deploy.jpg"]
+== Deployment
+
+== Deployment
+
+* Bare metal
+* Cloud
+** Clever cloud
+** Heroku
+** AWS
+** CloudFoundry
+** OpenShift
+* Docker
+
+== Deployment
+
+* Apache Tomcat?
+* JBoss?
+* Wildfly?
+* Standalone (Spring Boot, vert.x, ...)
+
+== Performance
+
+* Fast configuration
+* Fast execution
+* Incremental builds
+* Task cache
+** Local cache
+** Distributed cache
+
+== Performance
+
+screencast:maven-vs-gradle[]
+
+[data-background="images/charts.jpg"]
+== Analytics
+
+== Analytics
+
+image::analytics1.png[]
+
+== Analytics
+
+image::analytics2.png[]
+
+== Provenance
+
+* How did a task get configured?
+* Which plugins were applied?
+* Where does a dependency come from?
+* What came first?
+
+== Summary
+
+* Builds do not have to be painful
+* Gradle can help
+* It's more than just a build tool!
+
+[%notitle]
+[data-background="images/questions.jpg"]
+== Questions
+
+== We're hiring!
+
+http://gradle.org/gradle-jobs/
+
+image::GradleLogoLarge.png[]
+
+== Thank you!
+
+* Follow me: http://twitter.com/CedricChampeau[@CedricChampeau]
+
+
+
