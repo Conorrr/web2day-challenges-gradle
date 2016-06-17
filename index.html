@@ -1,2 +1,154 @@
-Initial
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><meta name="author" content="by Cédric Champeau (@CedricChampeau)" /><title>Gradle and the Challenges of Modern Build Tools</title><meta content="yes" name="apple-mobile-web-app-capable" /><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style" /><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" name="viewport" /><link href="reveal.js/css/reveal.css" rel="stylesheet" /><link rel="stylesheet" href="reveal.js/css/theme/moon.css" id="theme" /><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" /><link href="reveal.js/lib/css/zenburn.css" rel="stylesheet" /><script>document.write( '<link rel="stylesheet" href="reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );</script><link rel="stylesheet" type="text/css" href="reveal.js/css/theme/asciinema-player.css" />
+<link rel="stylesheet" type="text/css" href="reveal.js/css/theme/github-gist.css" />
+<script src="reveal.js/css/theme/asciinema-player.js"></script></head><body><div class="reveal"><div class="slides"><section><h1>Gradle and the Challenges of Modern Build Tools</h1><p><small>by Cédric Champeau (@CedricChampeau)</small></p></section><section id="who-am-i" data-background="images/nantes.jpg"><h2>Who am I</h2><div class="listingblock"><div class="content"><pre class="highlight"><code class="groovy language-groovy">speaker {
+    name 'Cédric Champeau'
+    company 'Gradle Inc'
+    oss 'Apache Groovy committer',
+    successes (['Static type checker',
+                    'Static compilation',
+                    'Traits',
+                    'Markup template engine',
+                    'DSLs'])
+        failures Stream.of(bugs),
+        twitter '@CedricChampeau',
+        github 'melix',
+        extraDescription '''Groovy in Action 2 co-author
+Misc OSS contribs (Gradle plugins, deck2pdf, jlangdetect, ...)'''
+}</code></pre></div></div>
+<div class="imageblock" style=""><div class="content"><img src="./images/GradleLogoReg.png" alt="GradleLogoReg" /></div></div></section>
+<section id="groovy-in-action-2"><h2>Groovy in Action 2</h2><div class="paragraph"><p><span class="image"><img src="./images/koenig2.png" alt="koenig2" /></span></p></div>
+<div class="paragraph"><p><a href="https://www.manning.com/books/groovy-in-action-second-edition" class="bare">https://www.manning.com/books/groovy-in-action-second-edition</a></p></div></section>
+<section id="what-is-a-build-tool"><h2>What is a build tool?</h2><div class="ulist"><ul><li><p>Make</p></li><li><p>Ant</p></li><li><p>Maven</p></li><li><p>Sbt</p></li><li><p>Grunt</p></li><li><p>Gradle</p></li><li><p>&#8230;&#8203;</p></li></ul></div></section>
+<section id="why-a-build-tool"><h2>Why a build tool?</h2><div class="ulist"><ul><li><p>Automation</p></li><li><p>Integration of heterogeneous tools</p><div class="ulist"><ul><li><p>compiler</p></li><li><p>code quality</p></li><li><p>IDE</p></li><li><p>deployment</p></li></ul></div></li><li><p>Continuous integration</p></li><li><p>Continuous deployment</p></li></ul></div></section>
+<section><section id="software-has-evolved" data-background="images/evolution.jpg"><h2>Software has evolved</h2></section><section id="software-is-eating-the-world"><h2>Software is eating the world</h2><div class="ulist"><ul><li><p>No longer the IT crowd</p></li><li><p>From support to business</p></li></ul></div></section><section id="different-architectures"><h2>Different architectures</h2><div class="ulist"><ul><li><p>PHP</p></li><li><p>Big monolitic apps</p></li><li><p>Mobile apps</p></li><li><p>Multiplatform</p></li><li><p>Micro-services</p></li><li><p>Cloud</p></li></ul></div></section><section id="different-scale"><h2>Different scale</h2><div class="ulist"><ul><li><p>Enterprise repositories</p><div class="ulist"><ul><li><p>Ivy</p></li><li><p>Maven</p></li><li><p>Docker</p></li></ul></div></li><li><p>Enterprise builds</p><div class="ulist"><ul><li><p>Custom conventions</p></li><li><p>Corporate policies</p></li></ul></div></li></ul></div></section><section id="new-requirements"><h2>New requirements</h2><div class="ulist"><ul><li><p>TDD / BDD</p></li><li><p>Integration tests</p></li><li><p>Functional tests</p></li><li><p>Build pipelines</p></li></ul></div>
+<div class="paragraph"><p>In a word: automation</p></div></section></section>
+<section><section id="why-gradle"><h2>Why Gradle</h2></section><section id="a" data-background="images/End-Broken-Release-Processes-01.svg"></section><section id="a-2" data-background="images/End-Bug-Regressions-01.svg"></section><section id="a-3" data-background="images/End-Build-Script-Chaos.svg"></section><section id="a-4" data-background="images/End-Code-Freeze-01.svg"></section><section id="a-5" data-background="images/End-Deathmarched-01.svg"></section><section id="a-6" data-background="images/End-Long-Build-Times-01.svg"></section></section>
+<section id="polyglot-programming" data-background="images/Pieter_Bruegel_the_Elder-The_Tower_of_Babel.jpg"></section>
+<section id="polyglot-programming-2" data-background="images/Pieter_Bruegel_the_Elder-The_Tower_of_Babel.jpg"><h2>Polyglot programming</h2></section>
+<section id="polyglot-programming-3"><h2>Polyglot programming</h2><div class="ulist"><ul><li><p>Java / Groovy / Scala / Clojure / Kotlin / &#8230;&#8203;</p></li><li><p>Javascript</p></li><li><p>Native (C/C++/&#8230;&#8203;)</p></li><li><p>Swift</p></li><li><p>Python</p></li><li><p>Ruby</p></li></ul></div></section>
+<section><section id="multi-project-builds"><h2>Multi-project builds</h2></section><section id="svn-vs-git"><h2>SVN vs Git</h2><div class="ulist"><ul><li><p>Multiple branches</p></li><li><p>DVCS</p></li><li><p>Commit hash as version</p></li></ul></div></section><section id="mono-repo-vs-multi-repo"><h2>Mono-repo vs multi-repo</h2><div class="ulist"><ul><li><p>Usual tooling not adapted to multi-repo</p></li><li><p>Mono-repo cumbersome</p></li><li><p>Composite builds?</p></li></ul></div></section></section>
+<section id="dependency-management"><h2>Dependency management</h2><div class="ulist"><ul><li><p>Dependency substitution</p></li><li><p>Variant-aware</p></li><li><p>API vs implementation</p></li><li><p>Compile avoidance</p></li></ul></div></section>
+<section id="dependency-management-2"><h2>Dependency management</h2><div class="ulist"><ul><li><p>Dynamic versions caching / tuning</p></li><li><p>NPM anyone?</p></li><li><p>Build reproducibility</p></li></ul></div></section>
+<section><section id="deep-modeling" data-background="images/anatomy.svg"><h2>Deep modeling</h2></section><section id="conventions-are-not-rules"><h2>Conventions are not rules</h2><div class="ulist"><ul><li><p>Models first</p><div class="ulist"><ul><li><p>I want to build a <em>Java library</em></p></li><li><p>I want to build an <em>Android application</em></p></li><li><p>I want to build a <em>micro-service</em></p></li><li><p>I want to build a <em>Gradle plugin</em></p></li></ul></div></li></ul></div></section><section id="tools-should-not-get-in-the-way"><h2>Tools should not get in the way</h2><div class="ulist"><ul><li><p>Tools should <em>model</em> those</p></li><li><p>Conventions should be model aware</p></li></ul></div></section><section id="a-java-library"><h2>A Java library</h2><div class="listingblock"><div class="content"><pre class="highlight"><code class="groovy language-groovy">model {
+    components {
+        main(JvmLibrarySpec) {
+            targetPlatform 'java8'
+            targetPlatform 'java9'
+            api {
+               exports 'com.acme.mylib'
+            }
+        }
+    }
+    testSuites {
+        test(JUnitTestSuiteSpec) {
+            jUnitVersion '4.12'
+            testing $.components.main
+        }
+    }
+}</code></pre></div></div></section><section id="benefits-of-deep-modelling"><h2>Benefits of deep modelling</h2><div class="paragraph"><p>
+<div id="player-container-1b0da19f-4d5f-4922-8b09-2621b32300cd"></div>
+  <script>
+    asciinema_player.core.CreatePlayer('player-container-1b0da19f-4d5f-4922-8b09-2621b32300cd', 'compile-avoidance.json', { width: 114, height: 24, fontSize: 'medium' });
+  </script>
+</p></div></section></section>
+<section id="deployment" data-background="images/deploy.jpg"></section>
+<section id="deployment-2" data-background="images/deploy.jpg"><h2>Deployment</h2></section>
+<section id="deployment-3"><h2>Deployment</h2><div class="ulist"><ul><li><p>Bare metal</p></li><li><p>Cloud</p><div class="ulist"><ul><li><p>Clever cloud</p></li><li><p>Heroku</p></li><li><p>AWS</p></li><li><p>CloudFoundry</p></li><li><p>OpenShift</p></li></ul></div></li><li><p>Docker</p></li></ul></div></section>
+<section id="deployment-4"><h2>Deployment</h2><div class="ulist"><ul><li><p>Apache Tomcat?</p></li><li><p>JBoss?</p></li><li><p>Wildfly?</p></li><li><p>Standalone (Spring Boot, vert.x, &#8230;&#8203;)</p></li></ul></div></section>
+<section id="performance"><h2>Performance</h2><div class="ulist"><ul><li><p>Fast configuration</p></li><li><p>Fast execution</p></li><li><p>Incremental builds</p></li><li><p>Task cache</p><div class="ulist"><ul><li><p>Local cache</p></li><li><p>Distributed cache</p></li></ul></div></li></ul></div></section>
+<section id="performance-2"><h2>Performance</h2><div class="paragraph"><p>
+<div id="player-container-9bf47426-8b38-426b-bd29-07609bf84faf"></div>
+  <script>
+    asciinema_player.core.CreatePlayer('player-container-9bf47426-8b38-426b-bd29-07609bf84faf', 'maven-vs-gradle.json', { width: 114, height: 24, fontSize: 'medium' });
+  </script>
+</p></div></section>
+<section id="analytics" data-background="images/charts.jpg"><h2>Analytics</h2></section>
+<section id="analytics-2"><h2>Analytics</h2><div class="imageblock" style=""><div class="content"><img src="./images/analytics1.png" alt="analytics1" /></div></div></section>
+<section id="analytics-3"><h2>Analytics</h2><div class="imageblock" style=""><div class="content"><img src="./images/analytics2.png" alt="analytics2" /></div></div></section>
+<section id="provenance"><h2>Provenance</h2><div class="ulist"><ul><li><p>How did a task get configured?</p></li><li><p>Which plugins were applied?</p></li><li><p>Where does a dependency come from?</p></li><li><p>What came first?</p></li></ul></div></section>
+<section id="summary"><h2>Summary</h2><div class="ulist"><ul><li><p>Builds do not have to be painful</p></li><li><p>Gradle can help</p></li><li><p>It&#8217;s more than just a build tool!</p></li></ul></div></section>
+<section id="questions" data-background="images/questions.jpg"></section>
+<section id="we-re-hiring"><h2>We&#8217;re hiring!</h2><div class="paragraph"><p><a href="http://gradle.org/gradle-jobs/" class="bare">http://gradle.org/gradle-jobs/</a></p></div>
+<div class="imageblock" style=""><div class="content"><img src="./images/GradleLogoLarge.png" alt="GradleLogoLarge" /></div></div></section>
+<section id="thank-you"><h2>Thank you!</h2><div class="ulist"><ul><li><p>Follow me: <a href="http://twitter.com/CedricChampeau">@CedricChampeau</a></p></li></ul></div></section></div></div><script src="reveal.js/lib/js/head.min.js"></script><script src="reveal.js/js/reveal.js"></script><script>// See https://github.com/hakimel/reveal.js#configuration for a full list of configuration options
+Reveal.initialize({
+  // Display controls in the bottom right corner
+  controls: true,
+  // Display a presentation progress bar
+  progress: true,
+  // Display the page number of the current slide
+  slideNumber: true,
+  // Push each slide change to the browser history
+  history: true,
+  // Enable keyboard shortcuts for navigation
+  keyboard: true,
+  // Enable the slide overview mode
+  overview: true,
+  // Vertical centering of slides
+  center: true,
+  // Enables touch navigation on devices with touch input
+  touch: true,
+  // Loop the presentation
+  loop: false,
+  // Change the presentation direction to be RTL
+  rtl: false,
+  // Turns fragments on and off globally
+  fragments: true,
+  // Flags if the presentation is running in an embedded mode,
+  // i.e. contained within a limited portion of the screen
+  embedded: false,
+  // Number of milliseconds between automatically proceeding to the
+  // next slide, disabled when set to 0, this value can be overwritten
+  // by using a data-autoslide attribute on your slides
+  autoSlide: 0,
+  // Stop auto-sliding after user input
+  autoSlideStoppable: true,
+  // Enable slide navigation via mouse wheel
+  mouseWheel: false,
+  // Hides the address bar on mobile devices
+  hideAddressBar: true,
+  // Opens links in an iframe preview overlay
+  previewLinks: false,
+  // Theme (e.g., beige, black, league, night, serif, simple, sky, solarized, white)
+  // NOTE setting the theme in the config no longer works in reveal.js 3.x
+  //theme: Reveal.getQueryHash().theme || 'moon',
+  // Transition style (e.g., none, fade, slide, convex, concave, zoom)
+  transition: Reveal.getQueryHash().transition || 'linear',
+  // Transition speed (e.g., default, fast, slow)
+  transitionSpeed: 'default',
+  // Transition style for full page slide backgrounds (e.g., none, fade, slide, convex, concave, zoom)
+  backgroundTransition: 'fade',
+  // Number of slides away from the current that are visible
+  viewDistance: 3,
+  // Parallax background image (e.g., "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'")
+  parallaxBackgroundImage: '',
+  // Parallax background size in CSS syntax (e.g., "2100px 900px")
+  parallaxBackgroundSize: '',
 
+  // The "normal" size of the presentation, aspect ratio will be preserved
+  // when the presentation is scaled to fit different resolutions. Can be
+  // specified using percentage units.
+  width: 960,
+  height: 700,
+
+  // Factor of the display size that should remain empty around the content
+  margin: 0.1,
+
+  // Bounds for smallest/largest possible scale to apply to content
+  minScale: 0.2,
+  maxScale: 1.5,
+
+  // Optional libraries used to extend on reveal.js
+  dependencies: [
+      { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+      { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+  ]
+});</script><div id="footer">
+  <div class="display:inline">
+     #gr8conf #gradle - @CedricChampeau
+  </div>
+</div></body></html>
